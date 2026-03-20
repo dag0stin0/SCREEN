@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PubKey Live Wall Overlay</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --btc: #F7931A;
+  --bg: #0a0a0a;
+  --surface: rgba(14,14,14,0.96);
+  --border: rgba(255,255,255,0.08);
+  --text: #FFFFFF;
+  --muted: rgba(255,255,255,0.45);
+}
+html, body {
+  width:100vw; height:100vh;
+  overflow:hidden;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Barlow Condensed', sans-serif;
+  user-select:none;
+  cursor:none;
+}
+/* ─── TOP HUD ─────────────────────────────────────────────── */
+#hud {
+  position:fixed; top:0; left:0; right:0;
+  height:56px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center;
+  padding:0 28px; gap:24px;
+  z-index:200;
+  transition:opacity 0.3s;
+}
+#hud.hidden { opacity:0; pointer-events:none; }
+.logo {
+  font-size:26px; font-weight:700;
+  letter-spacing:0.06em;
+  color:var(--btc);
+  flex-shrink:0;
+}
+.logo span { color:#fff; }
+.hud-div {
+  width:1px; height:20px;
+  background:var(--border);
+  flex-shrink:0;
+}
+.btc-block {
+  display:flex; align-items:center; gap:10px;
+  flex-shrink:0;
+}
+.btc-lbl {
+  font-size:12px; color:var(--btc);
+  letter-spacing:0.12em;
+}
+#btc-price {
+  font-family:'JetBrains Mono',monospace;
+  font-size:20px; font-weight:700;
+}
+#btc-change {
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  padding:2px 8px;
+  border-radius:3px;
+}
+#btc-change.up   { background:rgba(34,197,94,0.12);  color:#22c55e; }
+#btc-change.down { background:rgba(239,68,68,0.12);  color:#ef4444; }
+#btc-change.flat { background:rgba(255,255,255,0.06); color:#888; }
+#event-tag {
+  font-size:14px; letter-spacing:0.12em;
+  color:var(--muted);
+  outline:none;
+  min-width:40px;
+}
+#event-tag:focus { color:#fff; border-bottom:1px solid var(--btc); }
+#clock {
+  margin-left:auto;
+  font-family:'JetBrains Mono',monospace;
+  font-size:22px; letter-spacing:0.06em;
+  flex-shrink:0;
+}
+/* ─── EVENT BANNER ───────────────────────────────────────── */
+#banner {
+  position:fixed; top:76px; left:50%;
+  transform:translateX(-50%);
+  text-align:center;
+  z-index:150;
+  transition:opacity 0.3s;
+  pointer-events:auto;
+}
+#banner.hidden { opacity:0; pointer-events:none; }
+#event-name {
+  font-size:clamp(40px,5vw,72px);
+  font-weight:700;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  outline:none; cursor:text;
+  display:block;
+}
+#event-name:focus { text-decoration:underline; text-decoration-color:var(--btc); }
+#event-sub {
+  font-size:clamp(14px,1.6vw,22px);
+  color:var(--muted);
+  letter-spacing:0.1em;
+  outline:none; cursor:text;
+  display:block;
+}
+#event-sub:focus { color:#fff; }
+/* ─── SIDEBAR (1/3 right) ────────────────────────────────── */
+#sidebar {
+  position:fixed; top:56px; right:0;
+  width:33.33vw;
+  bottom:52px;
+  background:var(--surface);
+  border-left:1px solid var(--border);
+  z-index:100;
+  display:flex; flex-direction:column;
+  overflow-y:auto;
+  transition:opacity 0.3s;
+}
+#sidebar.hidden { opacity:0; pointer-events:none; }
+.sidebar-header {
+  padding:16px 20px 8px;
+  font-size:13px;
+  letter-spacing:0.14em;
+  color:var(--btc);
+  border-bottom:1px solid var(--border);
+  font-weight:700;
+}
+.market-card {
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+}
+.market-card-title {
+  font-size:12px;
+  letter-spacing:0.12em;
+  color:var(--muted);
+  margin-bottom:8px;
+  text-transform:uppercase;
+}
+.market-card-value {
+  font-family:'JetBrains Mono',monospace;
+  font-size:28px;
+  font-weight:700;
+}
+.market-card-sub {
+  font-size:13px;
+  color:var(--muted);
+  margin-top:4px;
+}
+/* Probability bar */
+.prob-bar {
+  height:6px;
+  background:rgba(255,255,255,0.06);
+  border-radius:3px;
+  margin-top:10px;
+  overflow:hidden;
+}
+.prob-fill {
+  height:100%;
+  border-radius:3px;
+  transition:width 0.6s ease;
+}
+.prob-fill.home { background:#22c55e; }
+.prob-fill.away { background:#ef4444; }
+/* Odds row */
+.odds-row {
+  display:flex; justify-content:space-between;
+  align-items:center;
+  margin-top:6px;
+}
+.odds-team {
+  font-size:15px;
+  font-weight:600;
+}
+.odds-pct {
+  font-family:'JetBrains Mono',monospace;
+  font-size:18px;
+  font-weight:700;
+}
+.odds-pct.home { color:#22c55e; }
+.odds-pct.away { color:#ef4444; }
+/* Player props */
+.prop-row {
+  display:flex; justify-content:space-between;
+  align-items:center;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.prop-row:last-child { border-bottom:none; }
+.prop-name { font-size:14px; }
+.prop-line { font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--btc); }
+.prop-signal {
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  padding:2px 8px;
+  border-radius:3px;
+}
+.prop-signal.over  { background:rgba(34,197,94,0.12); color:#22c55e; }
+.prop-signal.under { background:rgba(239,68,68,0.12); color:#ef4444; }
+/* BTC sidebar card */
+.btc-card {
+  margin-top:auto;
+  padding:16px 20px;
+  border-top:1px solid var(--border);
+  background:rgba(247,147,26,0.04);
+}
+.btc-card-price {
+  font-family:'JetBrains Mono',monospace;
+  font-size:32px;
+  font-weight:700;
+  color:var(--btc);
+}
+.btc-card-label {
+  font-size:11px;
+  letter-spacing:0.14em;
+  color:var(--muted);
+}
+/* ─── PIP WINDOW ─────────────────────────────────────────── */
+#pip {
+  position:fixed;
+  bottom:72px; right:calc(33.33vw + 28px);
+  width:clamp(320px,25vw,520px);
+  height:clamp(180px,14vw,292px);
+  background:#000;
+  border:2px solid var(--btc);
+  border-radius:4px;
+  z-index:200;
+  overflow:hidden;
+  cursor:move;
+  transition:opacity 0.3s;
+}
+#pip.hidden { opacity:0; pointer-events:none; }
+#pip-bar {
+  position:absolute; top:0; left:0; right:0;
+  height:26px;
+  background:rgba(0,0,0,0.88);
+  border-bottom:1px solid rgba(247,147,26,0.3);
+  display:flex; align-items:center;
+  padding:0 10px; gap:8px;
+  z-index:201; cursor:move;
+}
+#pip-lbl {
+  font-size:11px; color:var(--btc);
+  letter-spacing:0.12em; outline:none;
+  cursor:text;
+}
+#pip-lbl:focus { border-bottom:1px solid var(--btc); }
+.pip-btn {
+  margin-left:auto;
+  background:none; border:none;
+  color:var(--muted); cursor:pointer;
+  font-size:13px; padding:0 3px;
+  font-family:inherit;
+}
+.pip-btn:hover { color:#fff; }
+#pip-frame {
+  position:absolute; top:26px; left:0; right:0; bottom:0;
+  width:100%; height:calc(100% - 26px);
+  border:none;
+  background:#111;
+}
+#pip-placeholder {
+  position:absolute; top:26px; left:0; right:0; bottom:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:8px;
+  color:#333;
+}
+#pip-placeholder p { font-size:12px; letter-spacing:0.08em; }
+#pip-placeholder small { font-size:10px; color:#222; }
+/* ─── ALERTS ─────────────────────────────────────────────── */
+#alerts {
+  position:fixed; top:76px; left:28px;
+  z-index:180;
+  display:flex; flex-direction:column; gap:8px;
+}
+.alert-item {
+  background:var(--surface);
+  border-left:3px solid var(--btc);
+  padding:10px 14px;
+  border-radius:0 4px 4px 0;
+  max-width:320px;
+  animation:slide-in 0.3s ease;
+}
+.alert-item.removing { animation:slide-out 0.3s ease forwards; }
+.alert-title { font-size:13px; font-weight:700; letter-spacing:0.06em; color:var(--btc); }
+.alert-body  { font-size:16px; color:#fff; margin-top:2px; }
+@keyframes slide-in  { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:none; } }
+@keyframes slide-out { from { opacity:1; } to { opacity:0; transform:translateX(-20px); } }
+/* ─── TICKER ─────────────────────────────────────────────── */
+#ticker {
+  position:fixed; bottom:0; left:0; right:0;
+  height:52px;
+  background:var(--btc);
+  display:flex; align-items:center;
+  overflow:hidden; z-index:200;
+  transition:opacity 0.3s;
+}
+#ticker.hidden { opacity:0; pointer-events:none; }
+#ticker-badge {
+  flex-shrink:0;
+  background:#000; color:var(--btc);
+  height:100%;
+  display:flex; align-items:center;
+  padding:0 20px;
+  font-size:17px; font-weight:700;
+  letter-spacing:0.12em;
+  border-right:2px solid rgba(247,147,26,0.3);
+}
+#ticker-scroll { flex:1; overflow:hidden; height:100%; }
+#ticker-inner {
+  display:flex; align-items:center;
+  white-space:nowrap;
+  color:#000;
+  font-size:18px; font-weight:600;
+  letter-spacing:0.03em;
+  height:100%;
+  animation:scroll-left 30s linear infinite;
+}
+.t-item { padding:0 32px; }
+.t-sep   { color:rgba(0,0,0,0.35); padding:0 4px; }
+@keyframes scroll-left {
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+/* ─── CONTROLS PANEL ─────────────────────────────────────── */
+#ctrl {
+  position:fixed; top:66px; right:16px;
+  background:rgba(10,10,10,0.95);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:12px 16px;
+  font-size:12px;
+  color:var(--muted);
+  z-index:300;
+  line-height:2;
+  min-width:190px;
+  cursor:default;
+}
+#ctrl.hidden { display:none; }
+#ctrl h4 { color:#fff; font-size:13px; font-weight:600; letter-spacing:0.08em; margin-bottom:4px; }
+kbd {
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:3px;
+  padding:1px 6px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:#ccc;
+}
+/* ─── PIP URL PROMPT ─────────────────────────────────────── */
+#pip-prompt {
+  display:none;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.7);
+  z-index:400;
+  align-items:center; justify-content:center;
+}
+#pip-prompt.open { display:flex; }
+#pip-form {
+  background:#111;
+  border:1px solid #333;
+  border-radius:8px;
+  padding:24px 28px;
+  min-width:420px;
+  cursor:default;
+}
+#pip-form h3 { font-size:18px; font-weight:700; margin-bottom:4px; }
+#pip-form p  { font-size:13px; color:var(--muted); margin-bottom:16px; }
+#pip-url-input {
+  width:100%;
+  background:#1a1a1a;
+  border:1px solid #333;
+  border-radius:4px;
+  color:#fff;
+  font-size:14px;
+  font-family:'JetBrains Mono',monospace;
+  padding:10px 12px;
+  outline:none;
+  margin-bottom:12px;
+}
+#pip-url-input:focus { border-color:var(--btc); }
+.form-row { display:flex; gap:8px; }
+.btn {
+  flex:1; padding:9px;
+  border:1px solid #333; border-radius:4px;
+  background:none; color:#fff;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:15px; font-weight:600;
+  letter-spacing:0.06em;
+  cursor:pointer;
+}
+.btn:hover { background:#1e1e1e; }
+.btn.primary { border-color:var(--btc); color:var(--btc); }
+.btn.primary:hover { background:rgba(247,147,26,0.08); }
+/* ─── ALERT PROMPT ───────────────────────────────────────── */
+#alert-prompt {
+  display:none;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.7);
+  z-index:400;
+  align-items:center; justify-content:center;
+}
+#alert-prompt.open { display:flex; }
+#alert-form {
+  background:#111;
+  border:1px solid #333;
+  border-radius:8px;
+  padding:24px 28px;
+  min-width:380px;
+  cursor:default;
+}
+#alert-form h3 { font-size:18px; font-weight:700; margin-bottom:16px; }
+#alert-text-input {
+  width:100%;
+  background:#1a1a1a;
+  border:1px solid #333;
+  border-radius:4px;
+  color:#fff;
+  font-size:15px;
+  font-family:'Barlow Condensed',sans-serif;
+  padding:10px 12px;
+  outline:none;
+  margin-bottom:8px;
+}
+#alert-text-input:focus { border-color:var(--btc); }
+#alert-label-input {
+  width:100%;
+  background:#1a1a1a;
+  border:1px solid #333;
+  border-radius:4px;
+  color:var(--btc);
+  font-size:13px;
+  font-family:'JetBrains Mono',monospace;
+  padding:8px 12px;
+  outline:none;
+  margin-bottom:12px;
+}
+#alert-label-input:focus { border-color:var(--btc); }
+</style>
+</head>
+<body>
+
+<!-- ─── TOP HUD ─────────────────────────────────────────────── -->
+<div id="hud">
+  <div class="logo">PUB<span>KEY</span></div>
+  <div class="hud-div"></div>
+  <div class="btc-block">
+    <span class="btc-lbl">BTC</span>
+    <span id="btc-price">$---</span>
+    <span id="btc-change" class="flat">0.00%</span>
+  </div>
+  <div class="hud-div"></div>
+  <span id="event-tag" contenteditable="true">LIVE</span>
+  <span id="clock">--:--:--</span>
+</div>
+
+<!-- ─── EVENT BANNER ─────────────────────────────────────── -->
+<div id="banner">
+  <span id="event-name" contenteditable="true">LOADING EVENT...</span>
+  <span id="event-sub" contenteditable="true">GEMINI PREDICTION MARKETS</span>
+</div>
+
+<!-- ─── SIDEBAR — MARKETS (1/3 right) ────────────────────── -->
+<div id="sidebar">
+  <div class="sidebar-header">GEMINI MARKETS — LIVE</div>
+
+  <!-- Win Odds -->
+  <div class="market-card" id="card-odds">
+    <div class="market-card-title">WIN PROBABILITY</div>
+    <div class="odds-row">
+      <span class="odds-team" id="home-name">HOME</span>
+      <span class="odds-pct home" id="home-pct">--</span>
+    </div>
+    <div class="prob-bar"><div class="prob-fill home" id="home-bar" style="width:50%"></div></div>
+    <div class="odds-row" style="margin-top:8px">
+      <span class="odds-team" id="away-name">AWAY</span>
+      <span class="odds-pct away" id="away-pct">--</span>
+    </div>
+    <div class="prob-bar"><div class="prob-fill away" id="away-bar" style="width:50%"></div></div>
+  </div>
+
+  <!-- Projected Score -->
+  <div class="market-card" id="card-score">
+    <div class="market-card-title">PROJECTED FINAL SCORE</div>
+    <div style="display:flex;gap:20px;align-items:baseline;">
+      <div>
+        <div style="font-size:12px;color:var(--muted);" id="score-home-lbl">HOME</div>
+        <div class="market-card-value" id="score-home">--</div>
+      </div>
+      <div style="font-size:24px;color:var(--muted);">—</div>
+      <div>
+        <div style="font-size:12px;color:var(--muted);" id="score-away-lbl">AWAY</div>
+        <div class="market-card-value" id="score-away">--</div>
+      </div>
+    </div>
+    <div class="market-card-sub" id="score-sub">Based on market implied totals</div>
+  </div>
+
+  <!-- Player Props -->
+  <div class="market-card" id="card-props">
+    <div class="market-card-title">PLAYER PROPS</div>
+    <div id="props-list">
+      <div class="prop-row">
+        <span class="prop-name">Loading...</span>
+        <span class="prop-line">--</span>
+        <span class="prop-signal over">--</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BTC Price -->
+  <div class="btc-card">
+    <div class="btc-card-label">BITCOIN — GEMINI EXCHANGE</div>
+    <div class="btc-card-price" id="btc-sidebar-price">$---</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:4px;" id="btc-sidebar-change">--</div>
+  </div>
+</div>
+
+<!-- ─── PIP WINDOW ───────────────────────────────────────── -->
+<div id="pip">
+  <div id="pip-bar">
+    <span id="pip-lbl" contenteditable="true">GAME FEED</span>
+    <button class="pip-btn" onclick="openPipPrompt()" title="Set URL">&#9881;</button>
+    <button class="pip-btn" onclick="togglePip()" title="Toggle PIP">&times;</button>
+  </div>
+  <div id="pip-placeholder">
+    <p>NO FEED LOADED</p>
+    <small>Press <kbd>P</kbd> to set stream URL</small>
+  </div>
+  <iframe id="pip-frame" style="display:none" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>
+</div>
+
+<!-- ─── ALERTS ───────────────────────────────────────────── -->
+<div id="alerts"></div>
+
+<!-- ─── TICKER ───────────────────────────────────────────── -->
+<div id="ticker">
+  <div id="ticker-badge">GEMINI</div>
+  <div id="ticker-scroll">
+    <div id="ticker-inner">
+      <span class="t-item">Loading market data...</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CONTROLS ─────────────────────────────────────────── -->
+<div id="ctrl" class="hidden">
+  <h4>CONTROLS</h4>
+  <kbd>H</kbd> Toggle HUD<br>
+  <kbd>B</kbd> Toggle Banner<br>
+  <kbd>S</kbd> Toggle Sidebar<br>
+  <kbd>P</kbd> PIP URL<br>
+  <kbd>T</kbd> Toggle Ticker<br>
+  <kbd>A</kbd> Push Alert<br>
+  <kbd>?</kbd> This Panel<br>
+  <kbd>F</kbd> Fullscreen
+</div>
+
+<!-- ─── PIP URL PROMPT ───────────────────────────────────── -->
+<div id="pip-prompt">
+  <div id="pip-form">
+    <h3>Set PIP Feed</h3>
+    <p>Paste a stream embed URL or any web page</p>
+    <input id="pip-url-input" type="url" placeholder="https://..." autocomplete="off">
+    <div class="form-row">
+      <button class="btn" onclick="closePipPrompt()">Cancel</button>
+      <button class="btn primary" onclick="setPipUrl()">Load</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ALERT PROMPT ─────────────────────────────────────── -->
+<div id="alert-prompt">
+  <div id="alert-form">
+    <h3>Push Alert</h3>
+    <input id="alert-label-input" type="text" placeholder="Label (e.g. SCORE UPDATE)" value="ALERT">
+    <input id="alert-text-input" type="text" placeholder="Alert message..." autocomplete="off">
+    <div class="form-row">
+      <button class="btn" onclick="closeAlertPrompt()">Cancel</button>
+      <button class="btn primary" onclick="pushAlertFromForm()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ──────────────────────────────────────────────────
+let btcOpen = null;
+let activeEvent = null;
+let activeContracts = [];
+
+// ─── CLOCK ──────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('en-US', { hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── BTC PRICE (Gemini REST) ────────────────────────────────
+async function fetchBTC() {
+  try {
+    const res = await fetch('https://api.gemini.com/v1/pubticker/btcusd');
+    const data = await res.json();
+    const price = parseFloat(data.last);
+    const open = parseFloat(data.open);
+    if (!btcOpen) btcOpen = open;
+    const change = ((price - btcOpen) / btcOpen * 100);
+    const fmt = '$' + price.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+
+    document.getElementById('btc-price').textContent = fmt;
+    document.getElementById('btc-sidebar-price').textContent = fmt;
+
+    const el = document.getElementById('btc-change');
+    const el2 = document.getElementById('btc-sidebar-change');
+    const sign = change >= 0 ? '+' : '';
+    const txt = sign + change.toFixed(2) + '%';
+    el.textContent = txt;
+    el2.textContent = '24h: ' + txt;
+    el.className = change > 0 ? 'up' : change < 0 ? 'down' : 'flat';
+  } catch(e) {
+    console.warn('BTC fetch error:', e);
+  }
+}
+fetchBTC();
+setInterval(fetchBTC, 10000);
+
+// ─── GEMINI PREDICTION MARKETS ──────────────────────────────
+const GEMINI_PM_BASE = 'https://api.gemini.com/v1/prediction-markets';
+
+async function fetchSportsEvents() {
+  try {
+    const res = await fetch(GEMINI_PM_BASE + '/events?category=Sports&status=active');
+    const data = await res.json();
+    if (data.events && data.events.length > 0) {
+      activeEvent = data.events[0];
+      renderEvent(activeEvent);
+    } else {
+      // Try fetching all active events if no sports-specific
+      const res2 = await fetch(GEMINI_PM_BASE + '/events?status=active');
+      const data2 = await res2.json();
+      if (data2.events && data2.events.length > 0) {
+        activeEvent = data2.events[0];
+        renderEvent(activeEvent);
+      } else {
+        document.getElementById('event-name').textContent = 'NO ACTIVE EVENTS';
+        document.getElementById('event-sub').textContent = 'Waiting for next game...';
+      }
+    }
+  } catch(e) {
+    console.warn('Gemini PM fetch error:', e);
+    document.getElementById('event-name').textContent = 'MARKET OFFLINE';
+    document.getElementById('event-sub').textContent = 'Retrying...';
+    setTimeout(fetchSportsEvents, 15000);
+  }
+}
+
+function renderEvent(event) {
+  // Set banner
+  document.getElementById('event-name').textContent = event.title || event.name || 'LIVE EVENT';
+  const sub = event.subcategory ? event.subcategory.name : 'GEMINI PREDICTION MARKETS';
+  document.getElementById('event-sub').textContent = sub;
+
+  // Parse contracts for odds
+  activeContracts = event.contracts || [];
+  if (activeContracts.length >= 2) {
+    renderOdds(activeContracts);
+  } else if (activeContracts.length === 1) {
+    renderSingleContract(activeContracts[0]);
+  }
+
+  // Update ticker
+  renderTicker(event);
+}
+
+function renderOdds(contracts) {
+  // First two contracts = home / away (or YES/NO)
+  const c1 = contracts[0];
+  const c2 = contracts[1];
+
+  const p1 = c1.prices ? parseFloat(c1.prices.lastTradePrice || c1.prices.bestBid || 0.5) : 0.5;
+  const p2 = c2.prices ? parseFloat(c2.prices.lastTradePrice || c2.prices.bestBid || 0.5) : 0.5;
+
+  const name1 = c1.name || c1.title || 'TEAM A';
+  const name2 = c2.name || c2.title || 'TEAM B';
+
+  document.getElementById('home-name').textContent = name1;
+  document.getElementById('away-name').textContent = name2;
+  document.getElementById('home-pct').textContent = (p1 * 100).toFixed(1) + '%';
+  document.getElementById('away-pct').textContent = (p2 * 100).toFixed(1) + '%';
+  document.getElementById('home-bar').style.width = (p1 * 100) + '%';
+  document.getElementById('away-bar').style.width = (p2 * 100) + '%';
+
+  // Projected scores (rough estimate from implied probability)
+  const totalEst = 210; // default NBA estimate
+  document.getElementById('score-home-lbl').textContent = name1;
+  document.getElementById('score-away-lbl').textContent = name2;
+  document.getElementById('score-home').textContent = Math.round(totalEst * p1 / (p1 + p2));
+  document.getElementById('score-away').textContent = Math.round(totalEst * p2 / (p1 + p2));
+}
+
+function renderSingleContract(contract) {
+  const p = contract.prices ? parseFloat(contract.prices.lastTradePrice || 0.5) : 0.5;
+  const name = contract.name || contract.title || 'YES';
+
+  document.getElementById('home-name').textContent = name;
+  document.getElementById('away-name').textContent = 'NO';
+  document.getElementById('home-pct').textContent = (p * 100).toFixed(1) + '%';
+  document.getElementById('away-pct').textContent = ((1 - p) * 100).toFixed(1) + '%';
+  document.getElementById('home-bar').style.width = (p * 100) + '%';
+  document.getElementById('away-bar').style.width = ((1 - p) * 100) + '%';
+}
+
+function renderTicker(event) {
+  const contracts = event.contracts || [];
+  let items = contracts.map(c => {
+    const price = c.prices ? (parseFloat(c.prices.lastTradePrice || 0) * 100).toFixed(1) + '%' : '--';
+    return `${c.name || c.title}: ${price}`;
+  });
+
+  // Duplicate for seamless scroll
+  const html = items.map(t => `<span class="t-item">${t}</span><span class="t-sep">|</span>`).join('');
+  document.getElementById('ticker-inner').innerHTML = html + html;
+}
+
+// Player props — render from additional contracts if available
+function renderProps(contracts) {
+  if (contracts.length <= 2) {
+    document.getElementById('props-list').innerHTML =
+      '<div class="prop-row"><span class="prop-name" style="color:var(--muted)">No player props available</span></div>';
+    return;
+  }
+
+  const props = contracts.slice(2, 7); // up to 5 extra contracts as props
+  document.getElementById('props-list').innerHTML = props.map(c => {
+    const price = c.prices ? parseFloat(c.prices.lastTradePrice || 0.5) : 0.5;
+    const isOver = price > 0.5;
+    return `
+      <div class="prop-row">
+        <span class="prop-name">${c.name || c.title}</span>
+        <span class="prop-line">${(price * 100).toFixed(0)}&#162;</span>
+        <span class="prop-signal ${isOver ? 'over' : 'under'}">${isOver ? 'OVER' : 'UNDER'}</span>
+      </div>`;
+  }).join('');
+}
+
+// Poll for updates
+async function pollMarkets() {
+  if (!activeEvent) return;
+  try {
+    const res = await fetch(GEMINI_PM_BASE + '/events/' + activeEvent.eventId);
+    const data = await res.json();
+    if (data) {
+      activeEvent = data;
+      const contracts = data.contracts || [];
+      if (contracts.length >= 2) renderOdds(contracts);
+      else if (contracts.length === 1) renderSingleContract(contracts[0]);
+      renderProps(contracts);
+      renderTicker(data);
+    }
+  } catch(e) {
+    console.warn('Poll error:', e);
+  }
+}
+
+fetchSportsEvents();
+setInterval(pollMarkets, 5000);
+
+// ─── PIP DRAG ───────────────────────────────────────────────
+(function(){
+  const pip = document.getElementById('pip');
+  const bar = document.getElementById('pip-bar');
+  let dragging = false, ox, oy;
+  bar.addEventListener('mousedown', e => {
+    if (e.target.tagName === 'BUTTON' || e.target.contentEditable === 'true') return;
+    dragging = true;
+    ox = e.clientX - pip.offsetLeft;
+    oy = e.clientY - pip.offsetTop;
+    document.body.style.cursor = 'move';
+  });
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    pip.style.left = (e.clientX - ox) + 'px';
+    pip.style.top = (e.clientY - oy) + 'px';
+    pip.style.right = 'auto';
+    pip.style.bottom = 'auto';
+  });
+  window.addEventListener('mouseup', () => {
+    dragging = false;
+    document.body.style.cursor = 'none';
+  });
+})();
+
+// ─── PIP CONTROLS ───────────────────────────────────────────
+function togglePip() {
+  document.getElementById('pip').classList.toggle('hidden');
+}
+function openPipPrompt() {
+  document.getElementById('pip-prompt').classList.add('open');
+  document.getElementById('pip-url-input').focus();
+}
+function closePipPrompt() {
+  document.getElementById('pip-prompt').classList.remove('open');
+}
+function setPipUrl() {
+  const url = document.getElementById('pip-url-input').value.trim();
+  if (!url) return;
+  document.getElementById('pip-frame').src = url;
+  document.getElementById('pip-frame').style.display = 'block';
+  document.getElementById('pip-placeholder').style.display = 'none';
+  closePipPrompt();
+}
+
+// ─── ALERTS ─────────────────────────────────────────────────
+function pushAlert(label, text, duration) {
+  duration = duration || 8000;
+  const el = document.createElement('div');
+  el.className = 'alert-item';
+  el.innerHTML = `<div class="alert-title">${label}</div><div class="alert-body">${text}</div>`;
+  document.getElementById('alerts').appendChild(el);
+  setTimeout(() => {
+    el.classList.add('removing');
+    setTimeout(() => el.remove(), 300);
+  }, duration);
+}
+
+function openAlertPrompt() {
+  document.getElementById('alert-prompt').classList.add('open');
+  document.getElementById('alert-text-input').focus();
+}
+function closeAlertPrompt() {
+  document.getElementById('alert-prompt').classList.remove('open');
+}
+function pushAlertFromForm() {
+  const label = document.getElementById('alert-label-input').value || 'ALERT';
+  const text = document.getElementById('alert-text-input').value;
+  if (text) pushAlert(label, text);
+  document.getElementById('alert-text-input').value = '';
+  closeAlertPrompt();
+}
+
+// ─── KEYBOARD CONTROLS ─────────────────────────────────────
+document.addEventListener('keydown', e => {
+  // Don't capture if typing in an input or contenteditable
+  if (e.target.tagName === 'INPUT' || e.target.contentEditable === 'true') return;
+
+  switch(e.key.toLowerCase()) {
+    case 'h': document.getElementById('hud').classList.toggle('hidden'); break;
+    case 'b': document.getElementById('banner').classList.toggle('hidden'); break;
+    case 's': document.getElementById('sidebar').classList.toggle('hidden'); break;
+    case 'p': openPipPrompt(); break;
+    case 't': document.getElementById('ticker').classList.toggle('hidden'); break;
+    case 'a': openAlertPrompt(); break;
+    case '?': document.getElementById('ctrl').classList.toggle('hidden'); break;
+    case 'f':
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+      break;
+  }
+});
+
+// Enter key submits prompts
+document.getElementById('pip-url-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') setPipUrl();
+});
+document.getElementById('alert-text-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') pushAlertFromForm();
+});
+
+// ─── STARTUP ALERT ──────────────────────────────────────────
+setTimeout(() => {
+  pushAlert('SYSTEM', 'PubKey DC Wall Overlay — Online', 5000);
+}, 1000);
+</script>
+</body>
+</html>
