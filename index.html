@@ -85,7 +85,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:var(--bg);color:va
 .mk-team-pct{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;padding:2px 6px;border-radius:4px;min-width:36px;text-align:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);flex-shrink:0}
 .mk-team-pct.fav{background:var(--green-bg);border-color:rgba(0,230,118,0.15);color:var(--green)}
 .mk-team-pct.dog{background:rgba(255,255,255,0.03);color:var(--muted)}
-.mk-question{font-size:12px;font-weight:600;letter-spacing:0.06em;color:var(--muted);font-family:'Oswald',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
+.mk-question{font-size:12px;font-weight:600;letter-spacing:0.06em;color:var(--muted);font-family:'Oswald',sans-serif;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .mk-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:pulse 1.4s infinite;flex-shrink:0}
 .mk-counter{position:absolute;right:16px;bottom:4px;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--dim);letter-spacing:0.05em;z-index:2}
 
@@ -335,7 +335,7 @@ function buildTile(ev){
   /* Question/title */
   const qRow=document.createElement('div');qRow.className='mk-question';
   const qText=ev.title||ev.name||ev.description||'';
-  qRow.textContent=qText.length>36?qText.substring(0,34)+'…':qText;
+  qRow.textContent=qText;
   qRow.style.color=catColor;
   tile.appendChild(qRow);
 
