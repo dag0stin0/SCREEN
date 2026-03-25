@@ -46,49 +46,51 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:var(--bg);color:va
 #btc-change.flat{color:#666}
 #clock{position:fixed;bottom:12px;right:16px;font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--muted);z-index:100;text-shadow:0 1px 4px rgba(0,0,0,0.6)}
 
-/* ═══ SCOREBOARD — Bottom-left corner ═══ */
-#scoreboard{position:fixed;bottom:0;left:0;background:rgba(5,5,7,0.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:none;border-right:1px solid rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.04);border-radius:0 16px 0 0;padding:10px 24px;min-width:auto;max-width:520px;display:flex;align-items:center;z-index:100;transition:all 0.3s}
-#scoreboard.hide{opacity:0;transform:translateX(-520px);pointer-events:none}
-.sb-team{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
-.sb-team.away{flex-direction:row-reverse;text-align:right}
-.sb-team-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;color:var(--muted);flex-shrink:0}
-.sb-team-name{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;letter-spacing:0.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-team-odds{display:flex;align-items:center;gap:6px;margin-top:2px}
-.sb-team.away .sb-team-odds{justify-content:flex-end}
-.sb-team-pct{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px}
-.sb-team-pct.fav{background:var(--green-bg);color:var(--green)}
-.sb-team-pct.dog{background:rgba(255,255,255,0.05);color:var(--muted)}
-.sb-team-multi{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue)}
-.sb-center{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:0 16px;min-width:70px}
-.sb-vs{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.2em;color:var(--dim)}
-.sb-sport{font-size:10px;letter-spacing:0.12em;color:var(--madness);font-weight:600;margin-top:4px}
-.sb-prob-bar{width:120px;height:6px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,0.06);margin-top:8px;display:flex}
-.sb-prob-fill{height:100%;background:var(--green);transition:width 0.6s ease;border-radius:3px 0 0 3px}
-.sb-prob-rest{height:100%;background:rgba(255,255,255,0.08);flex:1}
+/* ═══ BTC PANEL — Bottom-left corner ═══ */
+#btc-panel{position:fixed;bottom:0;left:0;background:rgba(5,5,7,0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:none;border-right:1px solid rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.04);border-radius:0 16px 0 0;padding:14px 24px 14px 20px;display:flex;align-items:center;gap:16px;z-index:100;transition:all 0.3s}
+#btc-panel.hide{opacity:0;transform:translateX(-400px);pointer-events:none}
+.bp-icon{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#F7931A,#FF6B00);display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 0 20px rgba(247,147,26,0.25)}
+.bp-info{display:flex;flex-direction:column;gap:2px}
+.bp-label{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.12em;color:var(--btc)}
+#bp-price{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:#fff;letter-spacing:-0.02em}
+.bp-row{display:flex;align-items:center;gap:10px}
+#bp-change{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px}
+#bp-change.up{background:var(--green-bg);color:var(--green)}
+#bp-change.down{background:var(--red-bg);color:var(--red)}
+#bp-change.flat{color:#666}
+#bp-high,#bp-low{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
+.bp-spark{flex-shrink:0}
+.bp-spark canvas{display:block}
 
-/* ═══ MARKETS — Horizontal ticker strip below topbar, stacked matchups ═══ */
-#markets{position:fixed;top:48px;left:0;right:0;height:48px;background:rgba(5,5,7,0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;overflow:hidden;z-index:95;transition:all 0.3s}
-#markets.hide{opacity:0;transform:translateY(-52px);pointer-events:none}
+/* ═══ MARKETS — Slide-up carousel below topbar ═══ */
+#markets{position:fixed;top:48px;left:0;right:0;height:90px;background:rgba(5,5,7,0.5);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;overflow:hidden;z-index:95;transition:all 0.3s}
+#markets.hide{opacity:0;transform:translateY(-94px);pointer-events:none}
 .mk-header,.mk-tabs,.mk-btc{display:none}
-#mk-cards{display:flex;align-items:center;flex:1;overflow:hidden;white-space:nowrap;position:relative;height:100%;padding:0}
-#mk-cards::-webkit-scrollbar{display:none}
-#mk-scroll-inner{display:flex;align-items:center;white-space:nowrap;height:100%;position:absolute;will-change:transform}
-#mk-scroll-inner.go{animation:scrollMk var(--mkdur,60s) linear infinite}
-@keyframes scrollMk{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+#mk-cards{flex:1;overflow:hidden;position:relative;height:100%;padding:0}
 
-/* Stacked matchup card */
-.mk-card{display:inline-flex;flex-direction:column;justify-content:center;padding:4px 20px;height:100%;flex-shrink:0;gap:1px}
-.mk-team{display:flex;align-items:center;gap:6px;height:18px}
-.mk-team-name{font-size:12px;font-weight:700;font-family:'Oswald',sans-serif;letter-spacing:0.03em;color:#fff;min-width:90px}
-.mk-team-multi{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--blue);min-width:32px;text-align:right}
-.mk-team-pct{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;min-width:36px;text-align:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06)}
+/* Group card — slides up/down, holds 5 tiles */
+.mk-card{position:absolute;inset:0;display:flex;align-items:stretch;padding:0;transition:transform 0.5s cubic-bezier(0.4,0,0.2,1),opacity 0.5s ease}
+.mk-card.active{transform:translateY(0);opacity:1}
+.mk-card.out-up{transform:translateY(-100%);opacity:0}
+.mk-card.in-below{transform:translateY(100%);opacity:0}
+
+/* Each tile = one event, stacked vertically */
+.mk-tile{flex:1;display:flex;flex-direction:column;justify-content:center;padding:5px 14px;gap:2px;min-width:0;border-right:1px solid rgba(255,255,255,0.06)}
+.mk-tile:last-child{border-right:none}
+
+.mk-outcome{display:flex;align-items:center;gap:6px;min-width:0;height:18px}
+.mk-vs{font-size:8px;color:var(--dim);font-family:'Oswald',sans-serif;letter-spacing:0.08em;text-transform:uppercase;padding-left:11px;line-height:1}
+.mk-team-name{font-size:13px;font-weight:700;font-family:'Oswald',sans-serif;letter-spacing:0.03em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+.mk-team-multi{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue);min-width:30px;text-align:right;flex-shrink:0}
+.mk-team-pct{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;padding:2px 6px;border-radius:4px;min-width:36px;text-align:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);flex-shrink:0}
 .mk-team-pct.fav{background:var(--green-bg);border-color:rgba(0,230,118,0.15);color:var(--green)}
 .mk-team-pct.dog{background:rgba(255,255,255,0.03);color:var(--muted)}
-.mk-dot{width:4px;height:4px;border-radius:50%;background:var(--red);animation:pulse 1.4s infinite;flex-shrink:0}
-.mk-sep{width:1px;height:32px;background:rgba(255,255,255,0.06);flex-shrink:0;margin:0 4px}
+.mk-question{font-size:12px;font-weight:600;letter-spacing:0.06em;color:var(--muted);font-family:'Oswald',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
+.mk-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:pulse 1.4s infinite;flex-shrink:0}
+.mk-counter{position:absolute;right:16px;bottom:4px;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--dim);letter-spacing:0.05em;z-index:2}
 
 /* ═══ ALERTS ═══ */
-#alerts{position:fixed;top:102px;left:16px;z-index:110;display:flex;flex-direction:column;gap:6px;max-width:360px}
+#alerts{position:fixed;top:144px;left:16px;z-index:110;display:flex;flex-direction:column;gap:6px;max-width:360px}
 .al{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,109,0,0.15);border-left:3px solid var(--madness);padding:10px 14px;border-radius:0 14px 14px 0;animation:aIn 0.3s ease}
 .al.out{animation:aOut 0.3s ease forwards}
 .al-t{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.12em;color:var(--madness);text-transform:uppercase}
@@ -195,23 +197,31 @@ kbd{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);bo
 
 <div id="wd"></div>
 
-<div id="scoreboard">
-  <div class="sb-team home"><div class="sb-team-icon" id="sb-h-icon">--</div><div class="sb-team-info"><div class="sb-team-name" id="sb-h-name">HOME</div><div class="sb-team-odds"><span class="sb-team-pct fav" id="sb-h-pct">--%</span><span class="sb-team-multi" id="sb-h-multi">--</span></div></div></div>
-  <div class="sb-center"><div class="sb-vs">VS</div><div class="sb-sport" id="sb-sport">COLLEGE BASKETBALL</div><div class="sb-prob-bar"><div class="sb-prob-fill" id="sb-bar" style="width:50%"></div><div class="sb-prob-rest"></div></div></div>
-  <div class="sb-team away"><div class="sb-team-icon" id="sb-a-icon">--</div><div class="sb-team-info"><div class="sb-team-name" id="sb-a-name">AWAY</div><div class="sb-team-odds"><span class="sb-team-pct dog" id="sb-a-pct">--%</span><span class="sb-team-multi" id="sb-a-multi">--</span></div></div></div>
+<div id="btc-panel">
+  <div class="bp-icon">₿</div>
+  <div class="bp-info">
+    <span class="bp-label">BITCOIN</span>
+    <span id="bp-price">--</span>
+    <div class="bp-row">
+      <span id="bp-change" class="flat">--</span>
+      <span id="bp-high">H: --</span>
+      <span id="bp-low">L: --</span>
+    </div>
+  </div>
+  <div class="bp-spark"><canvas id="bp-spark-cv" width="100" height="40"></canvas></div>
 </div>
 
 <div id="markets">
-  <div id="mk-cards"><div id="mk-scroll-inner"></div></div>
+  <div id="mk-cards"></div>
 </div>
 
 <div id="alerts"></div>
-<div id="ctrl" class="hide"><h4>CONTROLS</h4><kbd>H</kbd> Toggle HUD<br><kbd>S</kbd> Toggle Scoreboard<br><kbd>M</kbd> Toggle Markets<br><kbd>V</kbd> Video Source<br><kbd>A</kbd> Push Alert<br><kbd>F</kbd> Fullscreen<br><kbd>?</kbd> This panel</div>
+<div id="ctrl" class="hide"><h4>CONTROLS</h4><kbd>H</kbd> Toggle HUD<br><kbd>S</kbd> Toggle BTC Panel<br><kbd>M</kbd> Toggle Markets<br><kbd>V</kbd> Video Source<br><kbd>A</kbd> Push Alert<br><kbd>F</kbd> Fullscreen<br><kbd>?</kbd> This panel</div>
 <div id="aprompt"><div id="aform"><h3>Push Alert</h3><input class="ai mono" id="al-label" placeholder="LABEL" value="UPSET ALERT" maxlength="40"><input class="ai" id="al-text" placeholder="Alert message..." maxlength="200"><div class="fr"><button class="btn" onclick="closeAP()">Cancel</button><button class="btn pri" onclick="submitAP()">Push</button></div></div></div>
 <div id="status">PUBKEY WALL v4.1</div>
 
 <script>
-const CFG={fetchTimeout:8000,btcInt:10000,mktInt:12000,tikInt:30000,maxAlerts:5,alertDur:8000,wdWarn:60,wdErr:300,pxThresh:0.5,perPage:30};
+const CFG={fetchTimeout:8000,btcInt:10000,mktInt:12000,tikInt:30000,maxAlerts:5,alertDur:8000,wdWarn:60,wdErr:300,pxThresh:0.5,perPage:50};
 function api(p){return 'https://api.gemini.com'+p}
 const S={btcPrice:null,btcPct:null,lastBtcA:null,events:[],pf:null,lastOk:Date.now(),fails:0,paused:false,tab:'all',featured:null,featIdx:0};
 
@@ -226,88 +236,168 @@ setInterval(wd,5000);
 function tick(){const n=new Date(),h=n.getHours()%12||12;document.getElementById('clock').textContent=h+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0')+' '+(n.getHours()>=12?'PM':'AM')}
 setInterval(tick,1000);tick();
 
+let dayCandles=[];/* close prices since midnight for sparkline */
+let dayHigh=0,dayLow=Infinity,dayOpen=0;
 async function fetchBTC(){
   const d=await sf(api('/v1/pricefeed'),'BTC');if(!d||!Array.isArray(d))return;S.pf=d;
   const b=d.find(x=>x.pair==='BTCUSD');if(!b)return;
   const p=parseFloat(b.price),pct=parseFloat(b.percentChange24h);if(isNaN(p))return;
   S.btcPrice=p;S.btcPct=pct;
   const ps='$'+p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  /* Top bar chip */
   document.getElementById('btc-price').textContent=ps;
   const sg=pct>=0?'+':'',cs=sg+pct.toFixed(2)+'%';
   const ce=document.getElementById('btc-change');
   ce.textContent=cs;
   ce.className=pct>0.01?'up':pct<-0.01?'down':'flat';
+  /* Bottom-left BTC panel */
+  document.getElementById('bp-price').textContent=ps;
+  /* Day change % (from midnight open) */
+  if(dayOpen>0){
+    const dayPct=((p-dayOpen)/dayOpen)*100;
+    const dsg=dayPct>=0?'+':'',dcs=dsg+dayPct.toFixed(2)+'%';
+    const bpc=document.getElementById('bp-change');
+    bpc.textContent=dcs;bpc.className=dayPct>0.01?'up':dayPct<-0.01?'down':'flat';
+  }
+  /* High/Low labels */
+  if(dayHigh>0)document.getElementById('bp-high').textContent='H: $'+dayHigh.toLocaleString('en-US',{maximumFractionDigits:0});
+  if(dayLow<Infinity)document.getElementById('bp-low').textContent='L: $'+dayLow.toLocaleString('en-US',{maximumFractionDigits:0});
+}
+async function fetchDayCandles(){
+  /* Fetch 15-min candles, filter to since midnight local time */
+  const d=await sf(api('/v2/candles/btcusd/15m'),'DayChart');
+  if(!d||!Array.isArray(d)||!d.length)return;
+  /* Gemini candles: [[time_ms,open,high,low,close,vol],...] newest first */
+  const now=new Date();
+  const midnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+  /* Filter to candles since midnight, sort oldest first */
+  const today=d.filter(c=>c[0]>=midnight).sort((a,b)=>a[0]-b[0]);
+  if(!today.length)return;
+  dayCandles=today.map(c=>parseFloat(c[4]));/* close prices */
+  dayOpen=parseFloat(today[0][1]);/* open of first candle = midnight open */
+  dayHigh=Math.max(...today.map(c=>parseFloat(c[2])));
+  dayLow=Math.min(...today.map(c=>parseFloat(c[3])));
+  /* Update current price into candles for real-time tip */
+  if(S.btcPrice){
+    dayCandles.push(S.btcPrice);
+    if(S.btcPrice>dayHigh)dayHigh=S.btcPrice;
+    if(S.btcPrice<dayLow)dayLow=S.btcPrice;
+  }
+  document.getElementById('bp-high').textContent='H: $'+dayHigh.toLocaleString('en-US',{maximumFractionDigits:0});
+  document.getElementById('bp-low').textContent='L: $'+dayLow.toLocaleString('en-US',{maximumFractionDigits:0});
+  drawSpark();
+}
+function drawSpark(){
+  const cv=document.getElementById('bp-spark-cv');if(!cv)return;
+  const ctx=cv.getContext('2d'),w=cv.width,h=cv.height;
+  ctx.clearRect(0,0,w,h);
+  if(dayCandles.length<2)return;
+  const mn=dayLow||Math.min(...dayCandles),mx=dayHigh||Math.max(...dayCandles),rng=mx-mn||1;
+  const cur=S.btcPrice||dayCandles[dayCandles.length-1];
+  const up=dayOpen>0?(cur>=dayOpen):(cur>=dayCandles[0]);
+  ctx.strokeStyle=up?'#00E676':'#FF1744';ctx.lineWidth=2;ctx.lineJoin='round';
+  ctx.beginPath();
+  dayCandles.forEach((v,i)=>{
+    const x=(i/(dayCandles.length-1))*w,y=h-((v-mn)/rng)*(h-4)-2;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  /* Gradient fill */
+  const grad=ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,(up?'rgba(0,230,118,':'rgba(255,23,68,')+'.15)');
+  grad.addColorStop(1,(up?'rgba(0,230,118,':'rgba(255,23,68,')+'.0)');
+  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
 }
 
 async function fetchMkts(){
   const d=await sf(api('/v1/prediction-markets/events?status=active&per_page='+CFG.perPage),'Mkts');if(!d)return;
   S.events=d.data||d.events||(Array.isArray(d)?d:[]);
-  const sports=S.events.filter(e=>(e.template==='sports-game'||e.contracts?.length===2)&&e.category==='Sports');
-  if(sports.length>0){S.featIdx=S.featIdx%sports.length;S.featured=sports[S.featIdx];S.featIdx++;renderSB(S.featured)}
   renderCards();
 }
 
 function gp(c){return parseFloat(c.prices?.lastTradePrice||c.prices?.buy?.yes||0.5)}
 
-function renderSB(ev){
-  if(!ev?.contracts||ev.contracts.length<2)return;
-  const c=ev.contracts,c0=c[0],c1=c[1],p0=gp(c0),p1=gp(c1),pct0=Math.round(p0*100),pct1=Math.round(p1*100);
-  const b0=parseFloat(c0.prices?.buy?.yes||c0.prices?.bestAsk||0),b1=parseFloat(c1.prices?.buy?.yes||c1.prices?.bestAsk||0);
-  document.getElementById('sb-h-name').textContent=c0.label||'Team 1';
-  document.getElementById('sb-a-name').textContent=c1.label||'Team 2';
-  document.getElementById('sb-h-icon').textContent=(c0.abbreviatedName||c0.label||'?').substring(0,4);
-  document.getElementById('sb-a-icon').textContent=(c1.abbreviatedName||c1.label||'?').substring(0,4);
-  const hp=document.getElementById('sb-h-pct'),ap=document.getElementById('sb-a-pct');
-  hp.textContent=pct0+'%';ap.textContent=pct1+'%';
-  hp.className='sb-team-pct '+(pct0>=pct1?'fav':'dog');ap.className='sb-team-pct '+(pct1>=pct0?'fav':'dog');
-  document.getElementById('sb-h-multi').textContent=b0>0?(1/b0).toFixed(1)+'x':'--';
-  document.getElementById('sb-a-multi').textContent=b1>0?(1/b1).toFixed(1)+'x':'--';
-  document.getElementById('sb-bar').style.width=pct0+'%';
-  document.getElementById('sb-sport').textContent=(ev.subcategory?.name||'SPORTS').toUpperCase();
+let mkGroups=[];let mkIdx=0;let mkTimer=null;const MK_PER=5;
+
+function buildTile(ev){
+  const cs=ev.contracts||[];if(!cs.length)return null;
+  const sorted=[...cs].sort((a,b)=>gp(b)-gp(a));
+  const c0=sorted[0],c1=sorted[1]||null;
+  const p0=Math.round(gp(c0)*100);
+  const b0=parseFloat(c0.prices?.buy?.yes||c0.prices?.bestAsk||0);
+  const cat=(ev.category||'').toLowerCase();
+  const isSport=cat==='sports';
+  const catColor=isSport?'var(--madness)':cat==='politics'?'#448AFF':cat==='crypto'?'var(--btc)':'#7C4DFF';
+
+  const tile=document.createElement('div');tile.className='mk-tile';
+
+  /* Question/title */
+  const qRow=document.createElement('div');qRow.className='mk-question';
+  const qText=ev.title||ev.name||ev.description||'';
+  qRow.textContent=qText.length>36?qText.substring(0,34)+'…':qText;
+  qRow.style.color=catColor;
+  tile.appendChild(qRow);
+
+  /* Outcome A */
+  const o1=document.createElement('div');o1.className='mk-outcome';
+  const dot1=document.createElement('span');dot1.className='mk-dot';dot1.style.background=catColor;
+  const n1=document.createElement('span');n1.className='mk-team-name';n1.textContent=c0.label||'?';
+  const m1=document.createElement('span');m1.className='mk-team-multi';m1.textContent=b0>0?(1/b0).toFixed(1)+'x':'--';
+  const pc1=document.createElement('span');pc1.className='mk-team-pct fav';pc1.textContent=p0+'%';
+  o1.appendChild(dot1);o1.appendChild(n1);o1.appendChild(m1);o1.appendChild(pc1);
+  tile.appendChild(o1);
+
+  /* vs + Outcome B */
+  if(c1){
+    const p1=Math.round(gp(c1)*100);
+    const b1=parseFloat(c1.prices?.buy?.yes||c1.prices?.bestAsk||0);
+    const o2=document.createElement('div');o2.className='mk-outcome';
+    const sp2=document.createElement('span');sp2.style.cssText='width:5px;flex-shrink:0';
+    const n2=document.createElement('span');n2.className='mk-team-name';n2.textContent=c1.label||'?';
+    const m2=document.createElement('span');m2.className='mk-team-multi';m2.textContent=b1>0?(1/b1).toFixed(1)+'x':'--';
+    const pc2=document.createElement('span');pc2.className='mk-team-pct dog';pc2.textContent=p1+'%';
+    o2.appendChild(sp2);o2.appendChild(n2);o2.appendChild(m2);o2.appendChild(pc2);
+    tile.appendChild(o2);
+  }
+  return tile;
+}
+
+function buildGroup(evts){
+  const card=document.createElement('div');card.className='mk-card in-below';
+  evts.forEach(ev=>{const t=buildTile(ev);if(t)card.appendChild(t)});
+  return card.children.length?card:null;
 }
 
 function renderCards(){
-  const inner=document.getElementById('mk-scroll-inner');inner.classList.remove('go');
-  const f=document.createDocumentFragment();
-  let evts=S.events;
-  const games=evts.filter(e=>(e.template==='sports-game'||e.contracts?.length===2));
-  if(!games.length){inner.textContent='';return}
-  games.forEach((ev,i)=>{
-    const cs=ev.contracts||[];if(cs.length<2)return;
-    const c0=cs[0],c1=cs[1];
-    const p0=Math.round(gp(c0)*100),p1=Math.round(gp(c1)*100);
-    const b0=parseFloat(c0.prices?.buy?.yes||c0.prices?.bestAsk||0);
-    const b1=parseFloat(c1.prices?.buy?.yes||c1.prices?.bestAsk||0);
+  const container=document.getElementById('mk-cards');
+  const allEvts=S.events.filter(e=>e.contracts&&e.contracts.length>=1);
+  if(!allEvts.length)return;
+  /* Chunk events into groups of MK_PER */
+  mkGroups=[];
+  for(let i=0;i<allEvts.length;i+=MK_PER){mkGroups.push(allEvts.slice(i,i+MK_PER))}
+  /* Show first group */
+  container.textContent='';
+  const first=buildGroup(mkGroups[0]);if(!first)return;
+  const ctr=document.createElement('div');ctr.className='mk-counter';ctr.id='mk-ctr';
+  ctr.textContent='1 / '+mkGroups.length;
+  container.appendChild(first);container.appendChild(ctr);
+  requestAnimationFrame(()=>{first.classList.remove('in-below');first.classList.add('active')});
+  mkIdx=0;
+  if(mkTimer)clearInterval(mkTimer);
+  mkTimer=setInterval(advanceCard,7000);
+}
 
-    /* Stacked card: team1 on top, team2 on bottom */
-    const card=document.createElement('div');card.className='mk-card';
-
-    /* Row 1 — team 1 */
-    const r1=document.createElement('div');r1.className='mk-team';
-    const dot1=document.createElement('span');dot1.className='mk-dot';
-    const n1=document.createElement('span');n1.className='mk-team-name';n1.textContent=c0.label||'?';
-    const m1=document.createElement('span');m1.className='mk-team-multi';m1.textContent=b0>0?(1/b0).toFixed(1)+'x':'--';
-    const pc1=document.createElement('span');pc1.className='mk-team-pct '+(p0>=p1?'fav':'dog');pc1.textContent=p0+'%';
-    r1.appendChild(dot1);r1.appendChild(n1);r1.appendChild(m1);r1.appendChild(pc1);
-
-    /* Row 2 — team 2 */
-    const r2=document.createElement('div');r2.className='mk-team';
-    const sp2=document.createElement('span');sp2.style.cssText='width:4px;flex-shrink:0';/* spacer for dot alignment */
-    const n2=document.createElement('span');n2.className='mk-team-name';n2.textContent=c1.label||'?';
-    const m2=document.createElement('span');m2.className='mk-team-multi';m2.textContent=b1>0?(1/b1).toFixed(1)+'x':'--';
-    const pc2=document.createElement('span');pc2.className='mk-team-pct '+(p1>=p0?'fav':'dog');pc2.textContent=p1+'%';
-    r2.appendChild(sp2);r2.appendChild(n2);r2.appendChild(m2);r2.appendChild(pc2);
-
-    card.appendChild(r1);card.appendChild(r2);f.appendChild(card);
-
-    /* Vertical separator */
-    const sep=document.createElement('div');sep.className='mk-sep';f.appendChild(sep);
-  });
-  inner.textContent='';inner.appendChild(f);
-  const cl=f.cloneNode(true);inner.appendChild(cl);
-  requestAnimationFrame(()=>{
-    const w=inner.scrollWidth/2;const dur=Math.max(w/50,25);inner.style.setProperty('--mkdur',dur+'s');inner.classList.add('go');
-  });
+function advanceCard(){
+  if(!mkGroups.length||S.paused)return;
+  const container=document.getElementById('mk-cards');
+  mkIdx=(mkIdx+1)%mkGroups.length;
+  const newCard=buildGroup(mkGroups[mkIdx]);if(!newCard)return;
+  const oldCard=container.querySelector('.mk-card.active');
+  if(oldCard){oldCard.classList.remove('active');oldCard.classList.add('out-up');setTimeout(()=>{if(oldCard.parentNode)oldCard.remove()},500)}
+  container.appendChild(newCard);
+  requestAnimationFrame(()=>{requestAnimationFrame(()=>{newCard.classList.remove('in-below');newCard.classList.add('active')})});
+  const ctr=document.getElementById('mk-ctr');
+  if(ctr)ctr.textContent=(mkIdx+1)+' / '+mkGroups.length;
 }
 
 function renderScoresTicker(){
@@ -501,12 +591,14 @@ function toggleVP(){document.getElementById('video-panel').classList.toggle('sho
 
 document.getElementById('vp-yt').addEventListener('keydown',e=>{if(e.key==='Enter')loadYT();if(e.key==='Escape')document.getElementById('video-panel').classList.remove('show')});
 
-document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;switch(e.key.toLowerCase()){case 'h':document.getElementById('topbar').classList.toggle('hide');break;case 's':document.getElementById('scoreboard').classList.toggle('hide');break;case 'm':document.getElementById('markets').classList.toggle('hide');break;case 'v':toggleVP();break;case 'a':openAP();break;case 'f':document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();break;case '?':document.getElementById('ctrl').classList.toggle('hide');break;case 'escape':closeAP();document.getElementById('ctrl').classList.add('hide');document.getElementById('video-panel').classList.remove('show');break}});
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;switch(e.key.toLowerCase()){case 'h':document.getElementById('topbar').classList.toggle('hide');break;case 's':document.getElementById('btc-panel').classList.toggle('hide');break;case 'm':document.getElementById('markets').classList.toggle('hide');break;case 'v':toggleVP();break;case 'a':openAP();break;case 'f':document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();break;case '?':document.getElementById('ctrl').classList.toggle('hide');break;case 'escape':closeAP();document.getElementById('ctrl').classList.add('hide');document.getElementById('video-panel').classList.remove('show');break}});
 
-document.addEventListener('visibilitychange',()=>{const i=document.getElementById('mk-scroll-inner');if(document.hidden){S.paused=true;if(i)i.style.animationPlayState='paused'}else{S.paused=false;if(i)i.style.animationPlayState='running'}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){S.paused=true}else{S.paused=false}});
 
-async function init(){await fetchBTC();await fetchMkts();pushA('PUBKEY DC','Gemini prediction markets live',6000);setInterval(async()=>{if(!S.paused){await fetchBTC();checkPA()}},CFG.btcInt);setInterval(async()=>{if(!S.paused)await fetchMkts()},CFG.mktInt)}
+async function init(){await fetchDayCandles();await fetchBTC();await fetchMkts();pushA('PUBKEY DC','Gemini prediction markets live',6000);setInterval(async()=>{if(!S.paused){await fetchBTC();checkPA()}},CFG.btcInt);setInterval(async()=>{if(!S.paused)await fetchMkts()},CFG.mktInt);setInterval(async()=>{if(!S.paused)await fetchDayCandles()},60000)}
 init();
+/* Auto-refresh page every 5 minutes to stay fresh & prevent memory leaks */
+setTimeout(()=>location.reload(),5*60*1000);
 </script>
 </body>
 </html>
